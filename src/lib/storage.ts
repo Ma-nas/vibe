@@ -32,10 +32,13 @@ export const addLink = (originalUrl: string): LinkData => {
   // Generate a random 6 character string for the ID
   const id = Math.random().toString(36).substring(2, 8);
   
+  // Get the base URL gracefully, accounting for subdirectories (like GitHub Pages) and existing Hashes
+  const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
+
   const newLink: LinkData = {
     id,
     originalUrl,
-    shortUrl: `${window.location.origin}/r/${id}`,
+    shortUrl: `${baseUrl}/#/r/${id}`,
     clicks: 0,
     createdAt: new Date().toISOString(),
   };
