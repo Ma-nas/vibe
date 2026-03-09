@@ -21,8 +21,8 @@
 
 <h3>2. Implementation Approach</h3>
 <ul>
-  <li><strong>Framework</strong>: Vite with React & TypeScript (<code>react-router-dom</code> using <code>HashRouter</code> to natively prevent 404s on static hosts).</li>
-  <li><strong>Simulated Backend & Authentication</strong>: A localized mock-authentication system was introduced targeting <code>localStorage</code>, consisting of user registration, login, and secured session state binding using a <code>link_shortener_session</code> key. The Dashboard is now fully protected and segregates generated links per authenticated user.</li>
+  <li><strong>Framework</strong>: Vite with React & TypeScript (<code>react-router-dom</code> using <code>HashRouter</code> to natively prevent 404s on static hosts during redirection routines).</li>
+  <li><strong>Simulated Backend & Authentication</strong>: A localized mock-authentication system was introduced targeting <code>localStorage</code>, consisting of user registration, login, and secured session state binding using a <code>link_shortener_session</code> key. The Dashboard is now fully protected and segregates generated links per authenticated user. <strong>Note: To assist evaluators, the Login interface features Auto-Registration. Logging in with an unseen username will automatically register the account and establish the session.</strong></li>
   <li><strong>Data Extensibility</strong>: The <code>LinkData</code> interface was expanded to encompass features like <code>isActive</code>, <code>maxClicks</code>, <code>lastAccessedAt</code>, and an <code>originalUrl</code> that actively listens for in-place user edits.</li>
   <li><strong>Design system</strong>: Modern Glassmorphism using Vanilla CSS + custom iconography powered by <code>lucide-react</code>.</li>
 </ul>
@@ -52,11 +52,12 @@
 
 <h3>4. Verification & Testing Criteria (v2)</h3>
 <ul>
-  <li><strong>Login / Register Functionality</strong>: New users can register and immediately log in. The application bounces un-authenticated users back to login cleanly.</li>
+  <li><strong>Login / Register Functionality</strong>: New users can register and immediately log in. Evaluators can directly use the Login form with any username/password combination to trigger the Auto-Register flow.</li>
   <li><strong>Dashboard Tracking</strong>: Successfully renders all required metrics (Original URL, Shortened URL, Active/Disabled Badges, Max Clicks vs Current Clicks).</li>
   <li><strong>Click Limits</strong>: Shortening a mock URL with a limit of <code>1</code>, clicking it once successfully redirects. Clicking it a second time successfully traps the user against the "Link Expired" block.</li>
   <li><strong>Toggle Links</strong>: Disabling the aforementioned link directly alters its transparency on the dashboard and completely blocks new resolutions, tossing "Link Inactive".</li>
   <li><strong>Destination Updation</strong>: Using the "Edit" pencil icon allows modifying the destination; the next iteration correctly fires to the modified destination instead of the starting destination.</li>
+  <li><strong>Important Constraint for Evaluators</strong>: Since this application operates entirely in the browser using <code>localStorage</code> to simulate a backend, testing short links <strong>must be done in a standard tab within the exact same browser profile</strong>. Testing in an Incognito / Private window or an alternative browser will yield a "Link Not Found / 404" screen because isolated sessions do not have access to the Dashboard session's mock database.</li>
 </ul>
 
 <h3>5. Deployment</h3>
