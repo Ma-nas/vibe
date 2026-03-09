@@ -1,0 +1,46 @@
+<html><body><pre># Product Requirements Document (PRD)
+## Link Analytics Shortener
+
+### 1. Overview
+The Link Analytics Shortener is a frontend-centric web application built with React and TypeScript. It offers users the ability to convert long, cumbersome URLs into compact short links. Furthermore, it tracks usage by recording click counts and stores all data locally in the browser, persisting it across page reloads.
+
+### 2. Implementation Approach
+To satisfy the requirements within the timeframe while ensuring a premium look and optimal performance, the following approach was taken:
+
+- **Framework & Tooling**: Vite with React & TypeScript for instantaneous compilation, rich type-safety, and modern frontend capabilities.
+- **Routing**: `react-router-dom` is used to implement a seamless Single Page Application (SPA). This allows routing to the dashboard (`/`) and intercepting shortlink redirects (`/r/:shortId`) accurately.
+- **Data Persistence Strategy**: Since a backend is not part of the required tech stack, `localStorage` is used as a simulated database. It reliably stores JavaScript objects mimicking rows of generated URLs, providing full persistence after page refreshes.
+- **Design & UI**: A modern Glassmorphism UI was built from scratch utilizing Vanilla CSS with deep aesthetics, custom gradients, and fluid micro-animations. `lucide-react` is employed for scalable vector iconography.
+
+### 3. Core Features & Functionality
+
+#### 3.1 URL Shortening System
+- Users input long URLs into a text field.
+- The system generates a cryptographically pseudo-random 6-character alphanumeric string (e.g., `xyz123`).
+- The link is saved locally and mapped to its original URL.
+
+#### 3.2 Redirection Mechanism
+- Whenever the browser accesses a route shaped like `http://.../r/:shortId`, the React app intercepts the path.
+- The application queries `localStorage` for the `:shortId`. 
+- If found, it increments the click count, saves it back to storage, and executes `window.location.href = originalUrl`.
+
+#### 3.3 Analytics & Click Tracking
+- The click tracking operates directly inside the Redirection component. Every valid hit against a short link forces a +1 increment to its storage entry before the physical browser redirection executes.
+
+#### 3.4 Dashboard
+- **Input Form**: Contains frontend validations to ensure empty or malformed strings are not processed.
+- **Links Grid**: Displays all previously generated links dynamically fetched from `localStorage`.
+- **Display Details**: Shows original URL, shortened URL, total clicks (live updated upon refresh), and creation date.
+- **Clipboard Utility**: Includes a 1-click button to copy the shortened URL straight to the user's clipboard.
+
+### 4. Verification & Testing Criteria
+1. **Valid URL Submission**: Test by interacting with the main input bar and supplying `https://github.com`.
+2. **Short Link Generation**: Verify a link like `http://localhost:5173/r/a1b2c3` appears.
+3. **Redirection Logic**: Accessing the link natively redirects the tab to the GitHub page.
+4. **Click Count Increase**: Returning to the dashboard confirms the specific link's click metric bumped from `0` to `1`.
+5. **Dashboard Rendering**: The created link appears distinctively in the Grid UI.
+6. **Data Persistence**: A hard `F5` refresh of the dashboard maintains the exact link history and metrics without any loss of data.
+
+### 5. Deployment
+*(Deployment link would be placed here when hosted to Vercel, Netlify, or another platform.)*
+</pre></body></html>
