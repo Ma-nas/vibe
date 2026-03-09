@@ -4,6 +4,10 @@ export interface LinkData {
   shortUrl: string;
   clicks: number;
   createdAt: string;
+  username: string;
+  isActive: boolean;
+  maxClicks: number | null;
+  lastAccessedAt: string | null;
 }
 
 const STORAGE_KEY = 'link_shortener_data';
@@ -26,13 +30,10 @@ export const saveLinks = (links: LinkData[]) => {
   }
 };
 
-export const addLink = (originalUrl: string): LinkData => {
+export const addLink = (originalUrl: string, username: string, maxClicks: number | null = null): LinkData => {
   const links = getLinks();
   
-  // Generate a random 6 character string for the ID
   const id = Math.random().toString(36).substring(2, 8);
-  
-  // Get the base URL gracefully, accounting for subdirectories (like GitHub Pages) and existing Hashes
   const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
 
   const newLink: LinkData = {
@@ -41,6 +42,10 @@ export const addLink = (originalUrl: string): LinkData => {
     shortUrl: `${baseUrl}/#/r/${id}`,
     clicks: 0,
     createdAt: new Date().toISOString(),
+    username,
+    isActive: true,
+    maxClicks,
+    lastAccessedAt: null
   };
 
   links.push(newLink);
@@ -58,6 +63,25 @@ export const incrementClicks = (id: string) => {
   const linkIndex = links.findIndex((l) => l.id === id);
   if (linkIndex !== -1) {
     links[linkIndex].clicks += 1;
+    links[linkIndex].lastAccessedAt = new Date().toISOString();
+    saveLinks(links);
+  }
+};
+
+export const toggleLinkStatus = (id: string) => {
+  const links = getLinks();
+  const linkIndex = links.findIndex((l) => l.id === id);
+  if (linkIndex !== -1) {
+    links[linkIndex].isActive = !links[linkIndex].isActive;
+    saveLinks(links);
+  }
+};
+
+export const updateDestinationUrl = (id: string, newUrl: string) => {
+  const links = getLinks();
+  const linkIndex = links.findIndex((l) => l.id === id);
+  if (linkIndex !== -1) {
+    links[linkIndex].originalUrl = newUrl;
     saveLinks(links);
   }
 };

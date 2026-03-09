@@ -4,13 +4,22 @@ import { getLinkById, incrementClicks } from './lib/storage';
 
 export default function Redirect() {
   const { shortId } = useParams<{ shortId: string }>();
-  const [error, setError] = useState(false);
+  const [errorType, setErrorType] = useState<'not-found' | 'inactive' | 'expired' | null>(null);
   const [destination, setDestination] = useState<string | null>(null);
 
   useEffect(() => {
     if (shortId) {
       const link = getLinkById(shortId);
       if (link) {
+        if (!link.isActive) {
+          setErrorType('inactive');
+          return;
+        }
+        if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+          setErrorType('expired');
+          return;
+        }
+
         // Increment the click count immediately
         incrementClicks(shortId);
         
@@ -25,16 +34,29 @@ export default function Redirect() {
           window.location.href = link.originalUrl;
         }
       } else {
-        setError(true);
+        setErrorType('not-found');
       }
     }
   }, [shortId]);
 
-  if (error) {
+  if (errorType) {
+    let title = '';
+    let message = '';
+    if (errorType === 'not-found') {
+      title = 'Link Not Found';
+      message = 'The shortened link you are trying to access does not exist.';
+    } else if (errorType === 'inactive') {
+      title = 'Link Inactive';
+      message = 'This link has been disabled by its owner.';
+    } else if (errorType === 'expired') {
+      title = 'Link Expired';
+      message = 'This link has reached its maximum click limit and is no longer active.';
+    }
+
     return (
       <div className="container" style={{ textAlign: 'center', marginTop: '100px' }}>
-        <h2>Link Not Found</h2>
-        <p>The shortened link you are trying to access does not exist.</p>
+        <h2>{title}</h2>
+        <p>{message}</p>
         <a href="/" className="btn btn-primary" style={{ marginTop: '20px', display: 'inline-block' }}>
           Go to Dashboard
         </a>
