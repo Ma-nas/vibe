@@ -5,15 +5,25 @@ import { getLinkById, incrementClicks } from './lib/storage';
 export default function Redirect() {
   const { shortId } = useParams<{ shortId: string }>();
   const [error, setError] = useState(false);
+  const [destination, setDestination] = useState<string | null>(null);
 
   useEffect(() => {
     if (shortId) {
       const link = getLinkById(shortId);
       if (link) {
-        // Increment the click count
+        // Increment the click count immediately
         incrementClicks(shortId);
-        // Redirect to the original URL
-        window.location.href = link.originalUrl;
+        
+        // Save the destination so we can show a fallback link
+        setDestination(link.originalUrl);
+
+        // Perform the redirect securely. window.location.replace is preferred to prevent back-button loops
+        try {
+          window.location.replace(link.originalUrl);
+        } catch (err) {
+          console.error("Redirect failed automatically:", err);
+          window.location.href = link.originalUrl;
+        }
       } else {
         setError(true);
       }
@@ -36,6 +46,14 @@ export default function Redirect() {
     <div className="container" style={{ textAlign: 'center', marginTop: '100px' }}>
       <div className="loader"></div>
       <h2>Redirecting...</h2>
+      {destination && (
+        <div style={{ marginTop: '2rem' }}>
+          <p>If you are not redirected automatically, click below:</p>
+          <a href={destination} className="short-url" style={{ display: 'inline-block', marginTop: '10px' }}>
+            Continue to {destination}
+          </a>
+        </div>
+      )}
     </div>
   );
 }
